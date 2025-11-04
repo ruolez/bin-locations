@@ -423,13 +423,22 @@ function displayBinLocationResults(bins) {
         const binId = bin.BinLocationID;
 
         return `
-            <div class="autocomplete-item" onclick="selectBinLocation(${binId}, '${escapeHtml(binName)}')">
+            <div class="autocomplete-item bin-location-item" data-bin-id="${binId}" data-bin-name="${escapeHtml(binName)}">
                 <div>${escapeHtml(binName)}</div>
             </div>
         `;
     }).join('');
 
     dropdown.classList.add('active');
+
+    // Attach event listeners to all bin location items
+    dropdown.querySelectorAll('.bin-location-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const binId = this.dataset.binId;
+            const binName = this.dataset.binName;
+            selectBinLocation(binId, binName);
+        });
+    });
 }
 
 // Select bin location from dropdown
@@ -481,7 +490,7 @@ function displayProductResults(products) {
         const qtyPerCase = product.UnitQty2 || 0;
 
         return `
-            <div class="autocomplete-item" onclick="selectProduct('${escapeHtml(upc)}', '${escapeHtml(description)}', ${qtyPerCase})">
+            <div class="autocomplete-item product-item" data-upc="${escapeHtml(upc)}" data-description="${escapeHtml(description)}" data-qty-per-case="${qtyPerCase}">
                 <div><strong>${escapeHtml(description)}</strong></div>
                 <small>UPC: ${escapeHtml(upc)} | Qty per Case: ${qtyPerCase > 0 ? qtyPerCase : 'Not Set'}</small>
             </div>
@@ -489,6 +498,16 @@ function displayProductResults(products) {
     }).join('');
 
     dropdown.classList.add('active');
+
+    // Attach event listeners to all product items
+    dropdown.querySelectorAll('.product-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const upc = this.dataset.upc;
+            const description = this.dataset.description;
+            const qtyPerCase = parseFloat(this.dataset.qtyPerCase) || 0;
+            selectProduct(upc, description, qtyPerCase);
+        });
+    });
 }
 
 // Select product from dropdown
