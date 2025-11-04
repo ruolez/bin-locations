@@ -115,13 +115,13 @@
   --color-status-info: var(--info);
 }
 
-/* Dark Theme - 2025 Professional Dark Mode (Material Design Standard) */
+/* Dark Theme - 2025 Professional Dark Mode (Slate-Cyan Industrial) */
 [data-theme="dark"] {
-  /* Primary Brand Colors - Highly desaturated for reduced eye strain */
-  --primary: #5ca3ff;
-  --primary-hover: #7ab8ff;
-  --primary-light: #1a2332;
-  --primary-dark: #4a91e8;
+  /* Primary Brand Colors - Slate blue-gray for maximum professionalism */
+  --primary: #78909c;
+  --primary-hover: #90a4ae;
+  --primary-light: #1e2528;
+  --primary-dark: #607d8b;
 
   /* Backgrounds - Material Design #121212 base with warm undertones */
   --background: #121314;
@@ -141,22 +141,22 @@
   --outline-light: #262628;
   --outline-hover: #404042;
 
-  /* Semantic Colors - Heavily desaturated for dark mode (20% less saturation) */
-  --error: #ef9595;
-  --error-light: #2d1818;
-  --error-hover: #f5a8a8;
-  --success: #6ee7a7;
-  --success-light: #1a2e1f;
-  --success-hover: #8aedba;
-  --warning: #fbbf24;
-  --warning-light: #2d2516;
-  --warning-hover: #fcd34d;
-  --info: #5ec9f8;
-  --info-light: #172a35;
+  /* Semantic Colors - Industrial warehouse-appropriate palette */
+  --error: #d77a61;
+  --error-light: #2d1f1a;
+  --error-hover: #e39682;
+  --success: #26a69a;
+  --success-light: #1a2e2c;
+  --success-hover: #4db6ac;
+  --warning: #ffca28;
+  --warning-light: #2d2816;
+  --warning-hover: #ffd54f;
+  --info: #64b5f6;
+  --info-light: #1a2530;
 
-  /* Focus Indicators - Brighter for dark mode visibility */
-  --focus: #5ca3ff;
-  --focus-ring: 0 0 0 3px rgba(92, 163, 255, 0.4);
+  /* Focus Indicators - Steel blue for consistency with slate theme */
+  --focus: #64b5f6;
+  --focus-ring: 0 0 0 3px rgba(100, 181, 246, 0.4);
 
   /* Shadows - Deeper for contrast on dark backgrounds */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
