@@ -1832,6 +1832,19 @@ tfoot td {
 .login-footer p {
   font-size: 14px;
   color: var(--text-secondary);
+  margin: 8px 0;
+}
+
+.login-footer .first-time-hint {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.login-footer .first-time-hint strong {
+  color: var(--primary);
+  font-weight: 600;
+  font-style: normal;
 }
 
 /* ============================================================================

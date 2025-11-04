@@ -98,24 +98,30 @@ docker-compose up -d --build
 
 4. Access the application at http://localhost:5556
 
-5. Configure database connection:
-   - Navigate to Settings page
+5. First-time setup:
+   - Login with `admin/admin` (default credentials)
+   - You'll be redirected to Settings page automatically
    - Enter SQL Server connection details
    - Test connection
    - Save configuration
+   - Logout and login with your SQL Server credentials
+
+**Note:** The `admin/admin` credentials only work when no database connection is configured. After setup, authentication is handled via the `Trustees_tbl` table in your SQL Server database.
+
+**See:** `FIRST_TIME_SETUP.md` for detailed setup instructions
 
 ## Usage
 
-### First Time Setup
+### Authentication
 
-1. Go to **Settings** page
-2. Enter your SQL Server connection details:
-   - Server address (IP or hostname)
-   - Port (default: 1433)
-   - Database name
-   - Username and password
-3. Click **Test Connection** to verify
-4. Click **Save Configuration**
+**First-Time Setup:**
+- Login with `admin/admin`
+- Configure database connection
+- Logout and login with SQL Server credentials
+
+**Normal Usage:**
+- Login with credentials from `Trustees_tbl`
+- All operations are tracked with username for audit trail
 
 ### Managing Bin Locations
 

@@ -46,11 +46,16 @@ async function handleLogin(e) {
         const result = await response.json();
 
         if (result.success) {
-            // Redirect to main page
-            window.location.href = '/';
+            // Check if first-time setup and redirect to settings
+            if (result.first_time_setup || result.redirect === '/settings') {
+                window.location.href = '/settings';
+            } else {
+                // Redirect to main page
+                window.location.href = '/';
+            }
         } else {
             if (result.needs_config) {
-                showError('Database not configured. Please configure the connection first.');
+                showError('Database not configured. Use admin/admin to access settings.');
             } else {
                 showError(result.message || 'Login failed');
             }

@@ -69,9 +69,8 @@ def history():
 
 
 @app.route('/settings')
-@login_required
 def settings():
-    """Settings page - Database Configuration"""
+    """Settings page - Database Configuration (accessible without login for first-time setup)"""
     return render_template('settings.html', username=session.get('username'))
 
 
@@ -141,6 +140,29 @@ def api_login():
         if not username or not password:
             return jsonify({'success': False, 'message': 'Username and password required'}), 400
 
+        # Check if database is configured
+        config = sqlite_manager.get_config()
+
+        # First-time setup: Allow admin/admin when no database connection configured
+        if not config or not config.get('server'):
+            if username == 'admin' and password == 'admin':
+                session['username'] = 'admin'
+                session['auto_id'] = 0
+                session['employee_id'] = 0
+                return jsonify({
+                    'success': True,
+                    'message': 'First-time setup login successful. Please configure database connection.',
+                    'username': 'admin',
+                    'first_time_setup': True,
+                    'redirect': '/settings'
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'First-time setup: Use admin/admin to configure database connection'
+                }), 401
+
+        # Normal authentication via database
         user = mssql_manager.verify_user_credentials(username, password)
 
         if user:
@@ -156,7 +178,7 @@ def api_login():
         if 'configuration not found' in error_msg.lower():
             return jsonify({
                 'success': False,
-                'message': 'Database not configured. Please configure the connection first.',
+                'message': 'Database not configured. Please use admin/admin to access settings.',
                 'needs_config': True
             }), 400
         return jsonify({'success': False, 'message': error_msg}), 500

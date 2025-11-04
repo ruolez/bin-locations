@@ -14,6 +14,12 @@ curl -fsSL https://raw.githubusercontent.com/ruolez/bin-locations/main/install.s
 http://YOUR_SERVER_IP
 ```
 
+**First-time login:**
+- Username: `admin`
+- Password: `admin`
+- Only works when no database configured
+- After setup, use SQL Server credentials
+
 ---
 
 ## Common Commands

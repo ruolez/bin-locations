@@ -49,7 +49,15 @@ After installation:
 http://YOUR_SERVER_IP
 ```
 
-Default credentials: Configure on first run via Settings page
+**First-time login credentials:**
+```
+Username: admin
+Password: admin
+```
+
+**Important:** These credentials only work when no database connection is configured. After configuring the database, use credentials from your SQL Server `Trustees_tbl` table.
+
+**See:** `FIRST_TIME_SETUP.md` for detailed setup instructions
 
 ---
 
