@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Bin Locations Management</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>Settings</h1>
+                <nav class="nav-links">
+                    <a href="/" class="nav-link">Bin Locations</a>
+                    <a href="/history" class="nav-link">History</a>
+                    <a href="/settings" class="nav-link active">Settings</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <!-- Dark Mode Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
+                    <div class="theme-toggle-slider"></div>
+                </button>
+                <div class="user-profile">
+                    <div class="user-info">{{ username }}</div>
+                    <button class="btn-logout" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="card">
+            <h2 style="margin-bottom: 24px; font-size: 20px; font-weight: 500;">Database Configuration</h2>
+
+            <form class="settings-form" id="configForm">
+                <!-- Server -->
+                <div class="form-group">
+                    <label for="server">SQL Server Address *</label>
+                    <input type="text" id="server" placeholder="e.g., localhost or 192.168.1.100" required>
+                    <small>IP address or hostname of your SQL Server</small>
+                </div>
+
+                <!-- Port -->
+                <div class="form-group">
+                    <label for="port">Port</label>
+                    <input type="number" id="port" value="1433" min="1" max="65535" required>
+                    <small>Default SQL Server port is 1433</small>
+                </div>
+
+                <!-- Database -->
+                <div class="form-group">
+                    <label for="database">Database Name *</label>
+                    <input type="text" id="database" placeholder="e.g., BackOffice" required>
+                    <small>Name of the database containing bin location tables</small>
+                </div>
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username">Username *</label>
+                    <input type="text" id="username" placeholder="SQL Server username" required autocomplete="username">
+                    <small>SQL Server authentication username</small>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" placeholder="SQL Server password" required autocomplete="current-password">
+                    <small>SQL Server authentication password</small>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 12px; margin-top: 32px;">
+                    <button type="button" class="btn btn-secondary" id="testConnectionBtn">
+                        Test Connection
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Save Configuration
+                    </button>
+                </div>
+            </form>
+
+            <!-- Connection Status -->
+            <div id="connectionStatus" style="margin-top: 24px; display: none;">
+                <div class="badge badge-success" id="statusBadge">
+                    <span id="statusText">Connection successful</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="spinner"></div>
+        <div>Testing connection...</div>
+    </div>
+
+    <!-- Load theme manager first -->
+    <script src="/static/js/theme.js"></script>
+    <!-- Load keyboard manager -->
+    <script src="/static/js/keyboard.js"></script>
+    <!-- Load settings script -->
+    <script src="/static/js/settings.js"></script>
+    <script>
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            themeManager.toggle();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operation History - Bin Locations Management</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>Bin Locations Management</h1>
+                <nav class="nav-links">
+                    <a href="/" class="nav-link">Bin Locations</a>
+                    <a href="/history" class="nav-link active">History</a>
+                    <a href="/settings" class="nav-link">Settings</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <!-- Dark Mode Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
+                    <div class="theme-toggle-slider"></div>
+                </button>
+                <div class="user-profile">
+                    <div class="user-info">{{ username }}</div>
+                    <button class="btn-logout" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="card">
+            <h2 style="margin-bottom: 24px;">Operation History</h2>
+
+            <!-- Statistics -->
+            <div id="statsContainer" class="history-stats" style="display: none;">
+                <!-- Stats will be inserted here -->
+            </div>
+
+            <!-- Filters -->
+            <div class="history-filters">
+                <div class="filter-group">
+                    <label for="filterOperation">Operation Type</label>
+                    <select id="filterOperation">
+                        <option value="ALL">All Operations</option>
+                        <option value="CREATE">Create</option>
+                        <option value="UPDATE">Update</option>
+                        <option value="ADJUST">Adjust</option>
+                        <option value="DELETE">Delete</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterStartDate">Start Date</label>
+                    <input type="date" id="filterStartDate">
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterEndDate">End Date</label>
+                    <input type="date" id="filterEndDate">
+                </div>
+
+                <div class="filter-group" style="min-width: auto;">
+                    <label>Notes</label>
+                    <div class="column-toggle-wrapper">
+                        <svg class="column-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showNotesColumn">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+                    <button class="btn btn-secondary" id="clearFiltersBtn">Clear</button>
+                    <button class="btn btn-secondary btn-icon" id="refreshHistoryBtn" title="Refresh">
+                        ↻
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Info -->
+            <div id="resultsInfo" style="margin-bottom: 16px; color: var(--text-secondary); font-size: 14px;">
+                <!-- Results count will be displayed here -->
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Operation</th>
+                            <th>Username</th>
+                            <th>Product UPC</th>
+                            <th>Product Description</th>
+                            <th>Bin</th>
+                            <th>Changes</th>
+                            <th class="notes-column">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- Rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Loading/Empty States -->
+            <div id="loadingState" class="loading-state" style="display: none;">
+                Loading history...
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <p>No history records found</p>
+                <small>Operations will appear here once you create, update, adjust, or delete records</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load theme manager first -->
+    <script src="/static/js/theme.js"></script>
+    <!-- Load keyboard manager -->
+    <script src="/static/js/keyboard.js"></script>
+    <!-- Load history script -->
+    <script src="/static/js/history.js"></script>
+    <script>
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            themeManager.toggle();
+        });
+    </script>
+</body>
+</html>
