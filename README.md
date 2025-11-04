@@ -55,13 +55,34 @@ Modern web application for managing warehouse bin locations and inventory tracki
 
 ## Installation
 
-### Prerequisites
+### Production Deployment (Ubuntu 24 Server)
 
+**One-line install on clean Ubuntu 24 server:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ruolez/bin-locations/main/install.sh | sudo bash
+```
+
+**Features:**
+- Installs all dependencies (Docker, NGINX, Git)
+- Configures NGINX reverse proxy on port 80
+- Auto-detects server IP for configuration
+- Interactive menu for install/update/remove
+- Preserves data on updates
+- Production-ready with auto-restart
+
+**See:** `DEPLOYMENT.md` and `INSTALL.md` for full documentation
+
+---
+
+### Local Development
+
+**Prerequisites:**
 - Docker and Docker Compose installed
 - MS SQL Server with BackOffice database
 - Network access to SQL Server
 
-### Quick Start
+**Quick Start:**
 
 1. Clone or download this repository
 
