@@ -12,13 +12,13 @@
    ============================================================================ */
 
 :root {
-  /* Light Theme - 2025 Enterprise Professional Palette */
+  /* Light Theme - 2025 Slate-Cyan Professional Palette */
 
-  /* Primary Brand Colors - Blue palette for trust and professionalism */
-  --primary: #0066ff;
-  --primary-hover: #0052cc;
-  --primary-light: #e6f0ff;
-  --primary-dark: #003d99;
+  /* Primary Brand Colors - Slate blue-gray for industrial professionalism */
+  --primary: #546e7a;
+  --primary-hover: #455a64;
+  --primary-light: #eceff1;
+  --primary-dark: #37474f;
 
   /* Backgrounds - Warm off-white for reduced eye strain */
   --background: #faf9f7;
@@ -38,22 +38,22 @@
   --outline-light: #f3f4f6;
   --outline-hover: #d1d5db;
 
-  /* Semantic Colors - Optimized for light backgrounds */
-  --error: #dc2626;
-  --error-light: #fef2f2;
-  --error-hover: #b91c1c;
-  --success: #059669;
-  --success-light: #ecfdf5;
-  --success-hover: #047857;
-  --warning: #f59e0b;
-  --warning-light: #fffbeb;
-  --warning-hover: #d97706;
-  --info: #0284c7;
-  --info-light: #f0f9ff;
+  /* Semantic Colors - Slate-Cyan industrial palette for light backgrounds */
+  --error: #c64a3a;
+  --error-light: #ffebe9;
+  --error-hover: #a83829;
+  --success: #00897b;
+  --success-light: #e0f2f1;
+  --success-hover: #00695c;
+  --warning: #f9a825;
+  --warning-light: #fff8e1;
+  --warning-hover: #f57f17;
+  --info: #1e88e5;
+  --info-light: #e3f2fd;
 
-  /* Focus Indicators - High contrast for keyboard navigation */
-  --focus: #0066ff;
-  --focus-ring: 0 0 0 3px rgba(0, 102, 255, 0.3);
+  /* Focus Indicators - Slate blue-gray for consistency */
+  --focus: #546e7a;
+  --focus-ring: 0 0 0 3px rgba(84, 110, 122, 0.3);
 
   /* Shadows - Soft and realistic */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
