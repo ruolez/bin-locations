@@ -370,6 +370,15 @@ tfoot strong {
   letter-spacing: -0.02em;
 }
 
+/* History page: Apply monospace to Product UPC and Changes columns */
+.data-table td:nth-child(4),
+.data-table td:nth-child(7),
+.change-details {
+  font-family: "JetBrains Mono", "Consolas", "Monaco", monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
 h4 {
   font-size: 16px;
   font-weight: 600;
