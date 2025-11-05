@@ -824,6 +824,23 @@ p {
   border-color: var(--primary);
 }
 
+.btn-export {
+  background: var(--success);
+  color: white;
+  box-shadow: var(--shadow-sm);
+  border: none;
+  font-size: 20px;
+}
+
+.btn-export:hover {
+  background: #00796b;
+  box-shadow: var(--shadow);
+}
+
+.btn-export:active {
+  background: #00695c;
+}
+
 .btn-icon {
   padding: 8px;
   min-width: 36px;

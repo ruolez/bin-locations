@@ -19,6 +19,7 @@ function setupEventListeners() {
     .getElementById("refreshBtn")
     .addEventListener("click", loadBinLocations);
   document.getElementById("addNewBtn").addEventListener("click", openAddModal);
+  document.getElementById("exportBtn").addEventListener("click", exportToExcel);
   document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 
   // Setup 3 search inputs
@@ -1072,6 +1073,123 @@ function registerKeyboardShortcuts() {
     },
     { description: "View history" },
   );
+}
+
+// ============================================================================
+// Export Functions
+// ============================================================================
+
+async function exportToExcel() {
+  showLoading();
+
+  try {
+    // Get currently filtered records
+    const filteredRecords = getFilteredRecords();
+
+    if (filteredRecords.length === 0) {
+      showToast("No records to export", "warning");
+      hideLoading();
+      return;
+    }
+
+    const response = await fetch("/api/export-excel", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        records: filteredRecords,
+      }),
+    });
+
+    if (handleAuthError(response)) {
+      hideLoading();
+      return;
+    }
+
+    if (!response.ok) {
+      const result = await response.json();
+      showToast(result.message || "Export failed", "error");
+      hideLoading();
+      return;
+    }
+
+    // Download the file
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+
+    // Extract filename from Content-Disposition header or use default
+    const contentDisposition = response.headers.get("Content-Disposition");
+    let filename = "bin_locations_export.xlsx";
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+      if (filenameMatch) {
+        filename = filenameMatch[1];
+      }
+    }
+
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    showToast(
+      `Exported ${filteredRecords.length} record(s) successfully`,
+      "success"
+    );
+  } catch (error) {
+    console.error("Export error:", error);
+    showToast("Failed to export records", "error");
+  } finally {
+    hideLoading();
+  }
+}
+
+function getFilteredRecords() {
+  const binSearchValue = document
+    .getElementById("binSearch")
+    .value.trim()
+    .toLowerCase();
+  const productSearchValue = document
+    .getElementById("productSearch")
+    .value.trim()
+    .toLowerCase();
+  const upcSearchValue = document
+    .getElementById("upcSearch")
+    .value.trim()
+    .toLowerCase();
+
+  return allRecords.filter((record) => {
+    const binLocation = (record.BinLocation || "").toLowerCase();
+    const productDescription = (record.ProductDescription || "").toLowerCase();
+    const productUPC = (record.ProductUPC || "").toLowerCase();
+
+    // Bin search: exact match (case-insensitive)
+    const binMatch =
+      !binSearchValue || binLocation === binSearchValue;
+
+    // Product search: contains match with wildcard support
+    let productMatch = true;
+    if (productSearchValue) {
+      if (productSearchValue.includes("%")) {
+        // SQL-style wildcard: convert % to regex .*
+        const regexPattern = productSearchValue.replace(/%/g, ".*");
+        const regex = new RegExp(regexPattern, "i");
+        productMatch = regex.test(productDescription);
+      } else {
+        productMatch = productDescription.includes(productSearchValue);
+      }
+    }
+
+    // UPC search: exact match (case-insensitive)
+    const upcMatch =
+      !upcSearchValue || productUPC === upcSearchValue;
+
+    return binMatch && productMatch && upcMatch;
+  });
 }
 
 // ============================================================================
