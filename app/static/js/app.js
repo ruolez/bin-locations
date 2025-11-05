@@ -52,14 +52,14 @@ function setupEventListeners() {
     });
   });
 
-  // Bin location search autocomplete
-  const binLocationSearch = document.getElementById("binLocationSearch");
+  // Bin location search autocomplete (modal)
+  const binLocationSearch = document.getElementById("modalBinLocationSearch");
   binLocationSearch.addEventListener("input", handleBinLocationSearch);
   binLocationSearch.addEventListener("focus", handleBinLocationSearch);
   binLocationSearch.addEventListener("keydown", handleAutocompleteKeydown);
 
-  // Product search autocomplete
-  const productSearch = document.getElementById("productSearch");
+  // Product search autocomplete (modal)
+  const productSearch = document.getElementById("modalProductSearch");
   productSearch.addEventListener("input", handleProductSearch);
   productSearch.addEventListener("focus", handleProductSearch);
   productSearch.addEventListener("keydown", handleAutocompleteKeydown);
@@ -67,17 +67,17 @@ function setupEventListeners() {
   // Close dropdowns when clicking outside
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".autocomplete-wrapper")) {
-      document.getElementById("productDropdown").classList.remove("active");
-      document.getElementById("binLocationDropdown").classList.remove("active");
+      document.getElementById("modalProductDropdown").classList.remove("active");
+      document.getElementById("modalBinLocationDropdown").classList.remove("active");
     }
   });
 
-  // Modal close on overlay click
-  document.getElementById("recordModal").addEventListener("click", (e) => {
-    if (e.target.id === "recordModal") {
-      closeModal();
-    }
-  });
+  // Modal close on overlay click - DISABLED for recordModal to prevent accidental closes
+  // document.getElementById("recordModal").addEventListener("click", (e) => {
+  //   if (e.target.id === "recordModal") {
+  //     closeModal();
+  //   }
+  // });
 
   document.getElementById("adjustModal").addEventListener("click", (e) => {
     if (e.target.id === "adjustModal") {
@@ -371,11 +371,11 @@ function openAddModal() {
   document.getElementById("modalTitle").textContent = "Add New Record";
   document.getElementById("recordForm").reset();
   document.getElementById("recordId").value = "";
-  document.getElementById("binLocationId").value = "";
-  document.getElementById("productUPC").value = "";
-  document.getElementById("productDescription").value = "";
-  document.getElementById("productDropdown").classList.remove("active");
-  document.getElementById("binLocationDropdown").classList.remove("active");
+  document.getElementById("modalBinLocationId").value = "";
+  document.getElementById("modalProductUPC").value = "";
+  document.getElementById("modalProductDescription").value = "";
+  document.getElementById("modalProductDropdown").classList.remove("active");
+  document.getElementById("modalBinLocationDropdown").classList.remove("active");
   document.getElementById("recordModal").classList.add("active");
 }
 
@@ -390,12 +390,12 @@ async function openEditModal(recordId) {
   currentEditId = recordId;
   document.getElementById("modalTitle").textContent = "Edit Record";
   document.getElementById("recordId").value = recordId;
-  document.getElementById("binLocationSearch").value = record.BinLocation || "";
-  document.getElementById("binLocationId").value = record.BinLocationID || "";
-  document.getElementById("productSearch").value =
+  document.getElementById("modalBinLocationSearch").value = record.BinLocation || "";
+  document.getElementById("modalBinLocationId").value = record.BinLocationID || "";
+  document.getElementById("modalProductSearch").value =
     record.ProductDescription || "";
-  document.getElementById("productUPC").value = record.ProductUPC || "";
-  document.getElementById("productDescription").value =
+  document.getElementById("modalProductUPC").value = record.ProductUPC || "";
+  document.getElementById("modalProductDescription").value =
     record.ProductDescription || "";
   document.getElementById("qtyPerCase").value = record.UnitQty2 || "";
   document.getElementById("caseQuantity").value = record.Qty_Cases || 0;
@@ -406,17 +406,17 @@ async function openEditModal(recordId) {
 function closeModal() {
   document.getElementById("recordModal").classList.remove("active");
   document.getElementById("recordForm").reset();
-  document.getElementById("productDropdown").classList.remove("active");
-  document.getElementById("binLocationDropdown").classList.remove("active");
+  document.getElementById("modalProductDropdown").classList.remove("active");
+  document.getElementById("modalBinLocationDropdown").classList.remove("active");
   currentEditId = null;
 }
 
 // Save record (create or update)
 async function saveRecord() {
-  const binLocationId = document.getElementById("binLocationId").value;
-  const productUPC = document.getElementById("productUPC").value;
+  const binLocationId = document.getElementById("modalBinLocationId").value;
+  const productUPC = document.getElementById("modalProductUPC").value;
   const productDescription =
-    document.getElementById("productDescription").value;
+    document.getElementById("modalProductDescription").value;
   const qtyPerCase = document.getElementById("qtyPerCase").value;
   const caseQuantity = document.getElementById("caseQuantity").value;
 
@@ -481,7 +481,7 @@ async function handleBinLocationSearch(e) {
 
   // Require at least 1 character (including % wildcard)
   if (query.length < 1) {
-    document.getElementById("binLocationDropdown").classList.remove("active");
+    document.getElementById("modalBinLocationDropdown").classList.remove("active");
     return;
   }
 
@@ -490,7 +490,8 @@ async function handleBinLocationSearch(e) {
       const response = await fetch(
         `/api/bins/search?q=${encodeURIComponent(query)}`,
       );
-      const result = await handleAuthError(response);
+      if (handleAuthError(response)) return;
+      const result = await response.json();
 
       if (result.success) {
         displayBinLocationResults(result.data || []);
@@ -503,7 +504,7 @@ async function handleBinLocationSearch(e) {
 
 // Display bin location search results
 function displayBinLocationResults(bins) {
-  const dropdown = document.getElementById("binLocationDropdown");
+  const dropdown = document.getElementById("modalBinLocationDropdown");
   autocompleteHighlightedIndex = -1; // Reset highlight
 
   if (bins.length === 0) {
@@ -540,9 +541,9 @@ function displayBinLocationResults(bins) {
 
 // Select bin location from dropdown
 function selectBinLocation(binId, binName) {
-  document.getElementById("binLocationSearch").value = binName;
-  document.getElementById("binLocationId").value = binId;
-  document.getElementById("binLocationDropdown").classList.remove("active");
+  document.getElementById("modalBinLocationSearch").value = binName;
+  document.getElementById("modalBinLocationId").value = binId;
+  document.getElementById("modalBinLocationDropdown").classList.remove("active");
 }
 
 // Handle product search
@@ -553,7 +554,7 @@ async function handleProductSearch(e) {
 
   // Allow single % wildcard, otherwise require 2+ characters
   if (query.length < 2 && query !== "%") {
-    document.getElementById("productDropdown").classList.remove("active");
+    document.getElementById("modalProductDropdown").classList.remove("active");
     return;
   }
 
@@ -575,7 +576,7 @@ async function handleProductSearch(e) {
 
 // Display product search results
 function displayProductResults(products) {
-  const dropdown = document.getElementById("productDropdown");
+  const dropdown = document.getElementById("modalProductDropdown");
   autocompleteHighlightedIndex = -1; // Reset highlight
 
   if (products.length === 0) {
@@ -615,11 +616,11 @@ function displayProductResults(products) {
 
 // Select product from dropdown
 function selectProduct(upc, description, qtyPerCase) {
-  document.getElementById("productSearch").value = description;
-  document.getElementById("productUPC").value = upc;
-  document.getElementById("productDescription").value = description;
+  document.getElementById("modalProductSearch").value = description;
+  document.getElementById("modalProductUPC").value = upc;
+  document.getElementById("modalProductDescription").value = description;
   document.getElementById("qtyPerCase").value = qtyPerCase || "";
-  document.getElementById("productDropdown").classList.remove("active");
+  document.getElementById("modalProductDropdown").classList.remove("active");
 }
 
 // Open adjust modal

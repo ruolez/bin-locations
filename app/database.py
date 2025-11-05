@@ -350,6 +350,7 @@ class MSSQLManager:
                 FROM dbo.Items_tbl
                 WHERE ProductDescription LIKE %s
                 AND ProductDescription IS NOT NULL
+                AND Discontinued = 0
                 ORDER BY ProductDescription
             ''', (search_pattern,))
             return cursor.fetchall()
