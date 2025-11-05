@@ -619,10 +619,46 @@ p {
    SEARCH INPUT WITH CLEAR BUTTON
    ============================================================================ */
 
+.search-container {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  max-width: 100%;
+}
+
 .search-box {
   position: relative;
   flex: 1;
   max-width: 500px;
+}
+
+.search-box-small {
+  flex: 1;
+  max-width: 200px;
+  min-width: 120px;
+}
+
+.search-box-small input {
+  padding: 12px 32px 12px 12px !important;
+  font-size: 14px;
+}
+
+/* Specific widths for each search field container */
+.search-box:has(#binSearch) {
+  flex: 0 0 150px;
+  max-width: 150px;
+  min-width: 150px;
+}
+
+.search-box:has(#productSearch) {
+  flex: 1;
+  max-width: none;
+}
+
+.search-box:has(#upcSearch) {
+  flex: 0 0 280px;
+  max-width: 280px;
+  min-width: 140px;
 }
 
 .search-box input {
@@ -636,6 +672,8 @@ p {
   color: var(--text-primary);
   transition: all var(--transition-base);
   box-shadow: var(--shadow-xs);
+  position: relative;
+  z-index: 1;
 }
 
 .search-box input:hover {
@@ -666,6 +704,11 @@ p {
   opacity: 0.7;
 }
 
+/* Hide search icon for small search boxes */
+.search-box-small::before {
+  display: none;
+}
+
 .search-clear {
   position: absolute;
   right: 12px;
@@ -682,6 +725,7 @@ p {
   opacity: 0;
   pointer-events: none;
   transition: all var(--transition-fast);
+  z-index: 2;
 }
 
 .search-box input:not(:placeholder-shown) + .search-clear {
@@ -2537,4 +2581,102 @@ tfoot td {
 }
 .p-4 {
   padding: 32px !important;
+}
+
+/* ============================================================================
+   Help Tooltip Styles
+   ============================================================================ */
+
+.help-icon-wrapper {
+  display: inline-block;
+  position: relative;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: help;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+  user-select: none;
+}
+
+.help-icon:hover {
+  background-color: var(--primary-hover);
+  transform: scale(1.1);
+}
+
+.help-tooltip {
+  position: absolute;
+  top: 24px;
+  left: -8px;
+  background-color: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 8px;
+  padding: 12px 14px;
+  min-width: 280px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0.2s;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.help-icon-wrapper:hover .help-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.help-tooltip-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--on-surface);
+  margin-bottom: 8px;
+}
+
+.help-tooltip-content {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.help-tooltip-content ul {
+  margin: 4px 0 0 0;
+  padding-left: 18px;
+  list-style-type: disc;
+}
+
+.help-tooltip-content li {
+  margin-bottom: 6px;
+}
+
+.help-tooltip-content li:last-child {
+  margin-bottom: 0;
+}
+
+.help-tooltip-example {
+  font-family: "JetBrains Mono", "Consolas", "Monaco", monospace;
+  font-size: 11px;
+  background-color: var(--primary-light);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--primary);
+  font-weight: 500;
 }

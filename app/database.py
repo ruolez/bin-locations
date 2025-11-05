@@ -322,32 +322,67 @@ class MSSQLManager:
         return {'success': True, 'message': 'Record deleted successfully'}
 
     def search_products(self, query: str) -> List[Dict[str, Any]]:
-        """Search products by description"""
+        """Search products by description with smart wildcard support"""
         with self.get_connection() as conn:
             cursor = conn.cursor(as_dict=True)
+
+            # Smart wildcard: if user includes %, use their exact pattern
+            # Otherwise, auto-wrap with % for standard substring search
+            if '%' in query:
+                search_pattern = query
+                # If pattern is just wildcards (no actual search text), treat as "show all"
+                stripped = query.replace('%', '').strip()
+                if not stripped:
+                    search_pattern = '%'
+                # If pattern doesn't end with %, add it for "contains" behavior
+                # This makes term1%term2 match "term1...term2...more" not just "term1...term2"
+                elif not search_pattern.endswith('%'):
+                    search_pattern = search_pattern + '%'
+            else:
+                search_pattern = f'%{query}%'
+
             cursor.execute('''
                 SELECT TOP 50
                     ProductID,
                     ProductUPC,
                     ProductDescription,
                     ISNULL(UnitQty2, 0) as UnitQty2
-                FROM Items_tbl
+                FROM dbo.Items_tbl
                 WHERE ProductDescription LIKE %s
                 AND ProductDescription IS NOT NULL
                 ORDER BY ProductDescription
-            ''', (f'%{query}%',))
+            ''', (search_pattern,))
             return cursor.fetchall()
 
-    def get_all_bins(self) -> List[Dict[str, Any]]:
-        """Get all bin locations"""
+    def search_bin_locations(self, query: str) -> List[Dict[str, Any]]:
+        """Search bin locations with smart wildcard support"""
         with self.get_connection() as conn:
             cursor = conn.cursor(as_dict=True)
+
+            # Smart wildcard: if user includes %, use their exact pattern
+            # Otherwise, auto-wrap with % for standard substring search
+            if '%' in query:
+                search_pattern = query
+                # If pattern is just wildcards (no actual search text), treat as "show all"
+                stripped = query.replace('%', '').strip()
+                if not stripped:
+                    search_pattern = '%'
+                # If pattern doesn't end with %, add it for "contains" behavior
+                # This makes term1%term2 match "term1...term2...more" not just "term1...term2"
+                elif not search_pattern.endswith('%'):
+                    search_pattern = search_pattern + '%'
+            else:
+                search_pattern = f'%{query}%'
+
             cursor.execute('''
-                SELECT BinLocationID, BinLocation
-                FROM BinLocations_tbl
-                WHERE BinLocation IS NOT NULL
+                SELECT TOP 50
+                    BinLocationID,
+                    BinLocation
+                FROM dbo.BinLocations_tbl
+                WHERE BinLocation LIKE %s
+                AND BinLocation IS NOT NULL
                 ORDER BY BinLocation
-            ''')
+            ''', (search_pattern,))
             return cursor.fetchall()
 
     # ========================================================================

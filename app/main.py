@@ -302,7 +302,8 @@ def search_products():
     """Search products by description"""
     try:
         query = request.args.get('q', '')
-        if len(query) < 2:
+        # Allow single % wildcard, otherwise require 2+ characters
+        if len(query) < 2 and query != '%':
             return jsonify({'success': True, 'data': []})
 
         products = mssql_manager.search_products(query)
@@ -311,12 +312,17 @@ def search_products():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
-@app.route('/api/bins', methods=['GET'])
+@app.route('/api/bins/search', methods=['GET'])
 @login_required
-def get_bins():
-    """Get all bin locations"""
+def search_bins():
+    """Search bin locations"""
     try:
-        bins = mssql_manager.get_all_bins()
+        query = request.args.get('q', '')
+        # Allow all queries with at least 1 character (including % wildcard)
+        if len(query) < 1:
+            return jsonify({'success': True, 'data': []})
+
+        bins = mssql_manager.search_bin_locations(query)
         return jsonify({'success': True, 'data': bins})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
