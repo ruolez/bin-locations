@@ -41,76 +41,63 @@
       <div class="card">
         <!-- Toolbar -->
         <div class="toolbar">
-          <div class="toolbar-left">
-            <div class="search-container">
-              <div class="search-box search-box-small">
-                <input
-                  type="text"
-                  id="binSearch"
-                  placeholder="Bin"
-                  autocomplete="off"
-                />
-                <button
-                  class="search-clear"
-                  id="binClear"
-                  type="button"
-                  aria-label="Clear bin search"
-                >
-                  ×
-                </button>
-              </div>
-              <div class="search-box search-box-small">
-                <input
-                  type="text"
-                  id="productSearch"
-                  placeholder="Product..."
-                  autocomplete="off"
-                />
-                <button
-                  class="search-clear"
-                  id="productClear"
-                  type="button"
-                  aria-label="Clear product search"
-                >
-                  ×
-                </button>
-              </div>
-              <div class="search-box search-box-small">
-                <input
-                  type="text"
-                  id="upcSearch"
-                  placeholder="UPC..."
-                  autocomplete="off"
-                />
-                <button
-                  class="search-clear"
-                  id="upcClear"
-                  type="button"
-                  aria-label="Clear UPC search"
-                >
-                  ×
-                </button>
-              </div>
+          <!-- Search Zone -->
+          <div class="toolbar-search">
+            <div class="search-box search-box-bin">
+              <input
+                type="text"
+                id="binSearch"
+                placeholder="Bin"
+                autocomplete="off"
+                aria-label="Search by bin location"
+              />
+              <button
+                class="search-clear"
+                id="binClear"
+                type="button"
+                aria-label="Clear bin search"
+              >
+                ×
+              </button>
+            </div>
+            <div class="search-box search-box-product">
+              <input
+                type="text"
+                id="productSearch"
+                placeholder="Search products..."
+                autocomplete="off"
+                aria-label="Search by product description"
+              />
+              <button
+                class="search-clear"
+                id="productClear"
+                type="button"
+                aria-label="Clear product search"
+              >
+                ×
+              </button>
+            </div>
+            <div class="search-box search-box-upc">
+              <input
+                type="text"
+                id="upcSearch"
+                placeholder="UPC/Barcode"
+                autocomplete="off"
+                aria-label="Search by UPC or barcode"
+              />
+              <button
+                class="search-clear"
+                id="upcClear"
+                type="button"
+                aria-label="Clear UPC search"
+              >
+                ×
+              </button>
             </div>
           </div>
-          <div class="toolbar-right">
-            <!-- View Toggle -->
-            <div class="view-toggle">
-              <button
-                class="view-toggle-btn active"
-                data-view="table"
-                title="Table view"
-              >
-                Table
-              </button>
-              <button
-                class="view-toggle-btn"
-                data-view="card"
-                title="Card view"
-              >
-                Cards
-              </button>
-            </div>
+
+          <!-- Actions Zone -->
+          <div class="toolbar-actions">
             <button
               class="btn btn-secondary btn-icon"
               id="refreshBtn"
@@ -140,6 +127,21 @@
               + Add New Record
             </button>
           </div>
+        </div>
+
+        <!-- Active Filters Bar (shows current search terms) -->
+        <div class="active-filters-bar" id="activeFiltersBar" style="display: none">
+          <div class="active-filters-content">
+            <span class="active-filters-label">Active filters:</span>
+            <div class="active-filters-list" id="activeFiltersList"></div>
+          </div>
+          <button
+            class="btn-clear-all-filters"
+            id="clearAllFiltersBtn"
+            title="Clear all filters"
+          >
+            Clear All
+          </button>
         </div>
 
         <!-- Top Summary -->

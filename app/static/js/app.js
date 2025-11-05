@@ -3,7 +3,6 @@ let allRecords = [];
 let currentEditId = null;
 let productSearchTimeout = null;
 let binSearchTimeout = null;
-let currentView = "table"; // 'table' or 'card'
 let autocompleteHighlightedIndex = -1;
 let autocompleteItems = [];
 
@@ -45,13 +44,10 @@ function setupEventListeners() {
     clearSearchField("upcSearch");
   });
 
-  // View toggle buttons
-  document.querySelectorAll(".view-toggle-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const view = e.currentTarget.dataset.view;
-      switchView(view);
-    });
-  });
+  // Clear all filters
+  document
+    .getElementById("clearAllFiltersBtn")
+    .addEventListener("click", clearAllFilters);
 
   // Bin location search autocomplete (modal)
   const binLocationSearch = document.getElementById("modalBinLocationSearch");
@@ -274,13 +270,12 @@ function handleSearch() {
   const productTerm = document.getElementById("productSearch").value.trim();
   const upcTerm = document.getElementById("upcSearch").value.trim();
 
+  // Update active filters display
+  updateActiveFilters({ bin: binTerm, product: productTerm, upc: upcTerm });
+
   // If all empty, show all records
   if (!binTerm && !productTerm && !upcTerm) {
-    if (currentView === "table") {
-      renderTable(allRecords);
-    } else {
-      renderCardView(allRecords);
-    }
+    renderTable(allRecords);
     return;
   }
 
@@ -316,11 +311,7 @@ function handleSearch() {
     return matches;
   });
 
-  if (currentView === "table") {
-    renderTable(filtered);
-  } else {
-    renderCardView(filtered);
-  }
+  renderTable(filtered);
 }
 
 // Wildcard pattern matching helper (converts SQL LIKE pattern to regex)
@@ -795,140 +786,70 @@ function escapeHtml(unsafe) {
 }
 
 // ============================================================================
-// View Toggle Functions (Table/Card)
+// ACTIVE FILTERS DISPLAY - 2025 PROFESSIONAL DESIGN
 // ============================================================================
 
-function switchView(view) {
-  currentView = view;
+function updateActiveFilters(filters) {
+  const activeFiltersBar = document.getElementById("activeFiltersBar");
+  const activeFiltersList = document.getElementById("activeFiltersList");
 
-  // Update button states
-  document.querySelectorAll(".view-toggle-btn").forEach((btn) => {
-    if (btn.dataset.view === view) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
-  });
+  const activeFilters = [];
 
-  // Get filtered records (respect current search)
-  const searchInput = document.getElementById("searchInput");
-  const searchTerm = searchInput.value.toLowerCase().trim();
-  let recordsToDisplay = allRecords;
-
-  if (searchTerm) {
-    recordsToDisplay = allRecords.filter((record) => {
-      const binLocation = (record.BinLocation || "").toLowerCase();
-      const productName = (record.ProductDescription || "").toLowerCase();
-      return (
-        binLocation.includes(searchTerm) || productName.includes(searchTerm)
-      );
+  if (filters.bin) {
+    activeFilters.push({ label: "Bin", value: filters.bin, field: "binSearch" });
+  }
+  if (filters.product) {
+    activeFilters.push({
+      label: "Product",
+      value: filters.product,
+      field: "productSearch",
     });
   }
-
-  // Re-render with current view
-  if (view === "table") {
-    renderTable(recordsToDisplay);
-  } else {
-    renderCardView(recordsToDisplay);
+  if (filters.upc) {
+    activeFilters.push({ label: "UPC", value: filters.upc, field: "upcSearch" });
   }
-}
 
-function renderCardView(records) {
-  const tbody = document.getElementById("tableBody");
-  const emptyState = document.getElementById("emptyState");
-  const tableContainer = document.querySelector(".table-container");
-  const topSummary = document.getElementById("topSummary");
-  const tableFoot = document.getElementById("tableFoot");
-
-  if (records.length === 0) {
-    tableContainer.style.display = "none";
-    emptyState.style.display = "block";
-    topSummary.style.display = "none";
-    tableFoot.style.display = "none";
+  if (activeFilters.length === 0) {
+    activeFiltersBar.style.display = "none";
     return;
   }
 
-  // Calculate totals
-  let totalCases = 0;
-  let totalItems = 0;
-
-  records.forEach((record) => {
-    totalCases += record.Qty_Cases || 0;
-    totalItems += record.TotalQuantity || 0;
-  });
-
-  // Update top summary
-  topSummary.style.display = "flex";
-  document.getElementById("topTotalCases").textContent =
-    totalCases.toLocaleString();
-  document.getElementById("topTotalItems").textContent =
-    totalItems.toLocaleString();
-  document.getElementById("topRecordCount").textContent =
-    records.length.toLocaleString();
-
-  // Hide table footer in card view
-  tableFoot.style.display = "none";
-
-  // Replace table with card grid
-  const cardGrid = document.createElement("div");
-  cardGrid.className = "card-grid";
-  cardGrid.innerHTML = records
-    .map((record) => {
-      const binLocation = record.BinLocation || "N/A";
-      const productName = record.ProductDescription || "N/A";
-      const caseQty = record.Qty_Cases || 0;
-      const qtyPerCase = record.UnitQty2 || 0;
-      const totalQty = record.TotalQuantity || 0;
-
-      const qtyPerCaseDisplay = qtyPerCase > 0 ? qtyPerCase : "Not Set";
-      const totalQtyDisplay = qtyPerCase > 0 ? totalQty.toLocaleString() : "—";
-
-      return `
-            <div class="record-card">
-                <div class="card-header">
-                    <div class="card-badge">${escapeHtml(binLocation)}</div>
-                </div>
-                <div class="card-body">
-                    <div class="card-title">
-                        ${escapeHtml(productName)}
-                    </div>
-                    <div class="card-info">
-                        <div class="card-info-row">
-                            <span class="card-info-label">Case Quantity:</span>
-                            <span class="card-info-value">${caseQty.toLocaleString()}</span>
-                        </div>
-                        <div class="card-info-row">
-                            <span class="card-info-label">Qty per Case:</span>
-                            <span class="card-info-value">${qtyPerCaseDisplay}</span>
-                        </div>
-                        <div class="card-info-row">
-                            <span class="card-info-label">Total Quantity:</span>
-                            <span class="card-info-value">${totalQtyDisplay}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <button class="btn btn-secondary btn-small" onclick="openEditModal(${record.id})" title="Edit">
-                        Edit
-                    </button>
-                    <button class="btn btn-primary btn-small" onclick="openAdjustModal(${record.id})" title="Adjust">
-                        Adjust
-                    </button>
-                    <button class="btn btn-error btn-small" onclick="openDeleteModal(${record.id})" title="Delete">
-                        Delete
-                    </button>
-                </div>
-            </div>
-        `;
-    })
+  activeFiltersBar.style.display = "flex";
+  activeFiltersList.innerHTML = activeFilters
+    .map(
+      (filter) => `
+    <div class="filter-badge">
+      <span class="filter-badge-label">${escapeHtml(filter.label)}:</span>
+      <span class="filter-badge-value">${escapeHtml(filter.value.toString())}</span>
+      <button class="filter-badge-remove" onclick="removeFilter('${filter.field}')" aria-label="Remove ${filter.label} filter">×</button>
+    </div>
+  `
+    )
     .join("");
-
-  // Replace table container content with card grid
-  tableContainer.innerHTML = "";
-  tableContainer.appendChild(cardGrid);
-  tableContainer.style.display = "block";
-  emptyState.style.display = "none";
 }
+
+function removeFilter(fieldId) {
+  const element = document.getElementById(fieldId);
+  if (element) {
+    element.value = "";
+    // Re-run search
+    handleSearch();
+  }
+}
+
+function clearAllFilters() {
+  // Clear search fields
+  document.getElementById("binSearch").value = "";
+  document.getElementById("productSearch").value = "";
+  document.getElementById("upcSearch").value = "";
+
+  // Re-run search to show all records
+  handleSearch();
+
+  showToast("All filters cleared", "info");
+}
+
+// Card view removed - table-only interface for warehouse efficiency
 
 // ============================================================================
 // Search Functions
@@ -1034,26 +955,15 @@ function registerKeyboardShortcuts() {
     { description: "Refresh data" },
   );
 
-  // Ctrl+K - Focus search
-  keyboardManager.register(
-    "ctrl+k",
-    () => {
-      const searchInput = document.getElementById("searchInput");
-      searchInput.focus();
-      searchInput.select();
-    },
-    { description: "Focus search box" },
-  );
-
-  // / - Focus search (alternative)
+  // / - Focus Product Search (industry standard)
   keyboardManager.register(
     "/",
     () => {
-      const searchInput = document.getElementById("searchInput");
-      searchInput.focus();
-      searchInput.select();
+      const productSearch = document.getElementById("productSearch");
+      productSearch.focus();
+      productSearch.select();
     },
-    { description: "Focus search box" },
+    { description: "Focus product search" },
   );
 
   // Ctrl+, - Open settings

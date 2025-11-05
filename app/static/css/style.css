@@ -554,119 +554,83 @@ p {
 }
 
 /* ============================================================================
-   TOOLBAR WITH VIEW TOGGLE
+   PROFESSIONAL TOOLBAR - 3 ZONE LAYOUT (2025 DESIGN)
    ============================================================================ */
 
 .toolbar {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
   align-items: center;
-  margin-bottom: 24px;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.toolbar-left {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex: 1;
-}
-
-.toolbar-right {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-/* View Toggle (Table/Card) */
-.view-toggle {
-  display: flex;
+  padding: 16px 20px;
   background: var(--surface);
   border: 1px solid var(--outline);
-  border-radius: 8px;
-  padding: 4px;
-  gap: 4px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-base);
 }
 
-.view-toggle-btn {
-  padding: 6px 12px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.view-toggle-btn:hover {
-  background: var(--background-alt);
-  color: var(--text-primary);
-}
-
-.view-toggle-btn.active {
-  background: var(--primary);
-  color: white;
+.toolbar:hover {
   box-shadow: var(--shadow-sm);
 }
 
-/* ============================================================================
-   SEARCH INPUT WITH CLEAR BUTTON
-   ============================================================================ */
-
-.search-container {
+/* Search Zone - Left aligned, takes available space */
+.toolbar-search {
   display: flex;
-  gap: 12px;
+  gap: 10px;
+  align-items: center;
   flex: 1;
-  max-width: 100%;
+  min-width: 0; /* Allow flex shrink */
 }
+
+/* Actions Zone - Right aligned, with visual divider */
+.toolbar-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding-left: 24px;
+  border-left: 1px solid var(--outline);
+  transition: border-color var(--transition-base);
+}
+
+/* ============================================================================
+   SEARCH BOXES - OPTIMIZED WIDTHS & ICONS (2025 DESIGN)
+   ============================================================================ */
 
 .search-box {
   position: relative;
-  flex: 1;
-  max-width: 500px;
+  display: flex;
+  align-items: center;
+  transition: all var(--transition-base);
 }
 
-.search-box-small {
-  flex: 1;
-  max-width: 200px;
-  min-width: 120px;
-}
-
-.search-box-small input {
-  padding: 12px 32px 12px 12px !important;
-  font-size: 14px;
-}
-
-/* Specific widths for each search field container */
-.search-box:has(#binSearch) {
-  flex: 0 0 120px;
-  max-width: 120px;
-  min-width: 120px;
-}
-
-.search-box:has(#productSearch) {
-  flex: 2;
-  max-width: none;
-}
-
-.search-box:has(#upcSearch) {
-  flex: 0 0 200px;
-  max-width: 200px;
+/* Bin Search - Narrow (warehouse bin codes are short) */
+.search-box-bin {
+  flex: 0 0 140px;
   min-width: 140px;
+  max-width: 140px;
+}
+
+/* Product Search - Wide (product descriptions are long) */
+.search-box-product {
+  flex: 3;
+  min-width: 300px;
+}
+
+/* UPC Search - Medium (barcodes are ~12 digits) */
+.search-box-upc {
+  flex: 0 0 220px;
+  min-width: 200px;
+  max-width: 220px;
 }
 
 .search-box input {
   width: 100%;
-  padding: 14px 48px 14px 48px;
-  border: 2px solid var(--outline);
-  border-radius: 12px;
-  font-size: 15px;
+  padding: 12px 36px 12px 14px;
+  border: 1px solid var(--outline);
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 500;
   background: var(--surface);
   color: var(--text-primary);
@@ -678,35 +642,22 @@ p {
 
 .search-box input:hover {
   border-color: var(--outline-hover);
+  box-shadow: var(--shadow-sm);
 }
 
 .search-box input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow:
-    0 0 0 4px var(--primary-light),
-    var(--shadow-sm);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.search-box input:focus + .search-clear {
+  opacity: 1;
 }
 
 .search-box input::placeholder {
   color: var(--text-tertiary);
   font-weight: 400;
-}
-
-.search-box::before {
-  content: "🔍";
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  pointer-events: none;
-  opacity: 0.7;
-}
-
-/* Hide search icon for small search boxes */
-.search-box-small::before {
-  display: none;
 }
 
 .search-clear {
@@ -738,18 +689,281 @@ p {
   color: var(--primary);
 }
 
-/* Search Results Badge */
-.search-results-badge {
+/* ============================================================================
+   ACTIVE FILTERS BAR - Shows current search filters
+   ============================================================================ */
+
+.active-filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--primary-light);
+  border: 1px solid var(--primary);
+  border-left-width: 4px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  animation: slideInDown 0.3s ease-out;
+}
+
+.active-filters-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.active-filters-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.active-filters-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.filter-badge-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.filter-badge-value {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.filter-badge-remove {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  margin-left: 4px;
+  line-height: 1;
+  transition: all var(--transition-fast);
+}
+
+.filter-badge-remove:hover {
+  color: var(--error);
+  transform: scale(1.2);
+}
+
+.btn-clear-all-filters {
+  padding: 6px 14px;
+  background: var(--error);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-clear-all-filters:hover {
+  background: var(--error-hover);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+/* ============================================================================
+   ADVANCED FILTERS PANEL - Collapsible filter options
+   ============================================================================ */
+
+.advanced-filters-panel {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-md);
+  animation: slideInDown 0.3s ease-out;
+  overflow: hidden;
+}
+
+.filters-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--background-alt);
+  border-bottom: 1px solid var(--outline);
+}
+
+.filters-panel-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.btn-close-panel {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 24px;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+}
+
+.btn-close-panel:hover {
+  background: var(--error-light);
+  color: var(--error);
+}
+
+.filters-panel-body {
+  padding: 20px;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.filters-panel-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--background-alt);
+  border-top: 1px solid var(--outline);
+}
+
+/* ============================================================================
+   MORE ACTIONS DROPDOWN - Overflow menu
+   ============================================================================ */
+
+.more-actions-dropdown {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  z-index: 100;
+  animation: slideDown 0.2s ease-out;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.dropdown-item:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.dropdown-item:not(:last-child) {
+  border-bottom: 1px solid var(--outline-light);
+}
+
+.dropdown-icon {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+.dropdown-item:hover .dropdown-icon {
+  opacity: 1;
+}
+
+/* ============================================================================
+   FILTER BUTTON STYLE
+   ============================================================================ */
+
+.btn-filter {
+  padding: 10px 18px;
+  background: var(--surface);
+  color: var(--primary);
+  border: 1px solid var(--outline);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-filter:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-filter:active {
   background: var(--primary);
   color: white;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 10px;
-  box-shadow: var(--shadow);
+}
+
+.btn-filter.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
 }
 
 /* ============================================================================
@@ -2369,6 +2583,42 @@ tfoot td {
    RESPONSIVE DESIGN
    ============================================================================ */
 
+/* ============================================================================
+   RESPONSIVE BREAKPOINTS - NEW TOOLBAR LAYOUT
+   ============================================================================ */
+
+@media (max-width: 1200px) {
+  /* Stack toolbar into 2 rows on medium screens */
+  .toolbar {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .toolbar-search {
+    gap: 8px;
+  }
+
+  .toolbar-filters,
+  .toolbar-actions {
+    border-left: none;
+    border-top: 1px solid var(--outline);
+    padding-left: 0;
+    padding-top: 16px;
+    justify-content: flex-end;
+  }
+
+  .toolbar-filters {
+    padding-top: 0;
+    border-top: none;
+    justify-content: flex-start;
+  }
+
+  /* Adjust search field widths */
+  .search-box-product {
+    min-width: 200px;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 0 16px;
@@ -2399,17 +2649,37 @@ tfoot td {
   }
 
   .toolbar {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .toolbar-search {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-box-bin,
+  .search-box-product,
+  .search-box-upc {
+    flex: 1;
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .toolbar-filters,
+  .toolbar-actions {
+    padding-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .active-filters-bar {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
   }
 
-  .toolbar-left,
-  .toolbar-right {
+  .btn-clear-all-filters {
     width: 100%;
-  }
-
-  .search-box {
-    max-width: none;
   }
 
   .table-container {
