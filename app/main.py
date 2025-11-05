@@ -526,6 +526,17 @@ def search_bins():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
+@app.route('/api/bin-locations/unused', methods=['GET'])
+@login_required
+def get_unused_bins():
+    """Get bin locations that are not used in Items_BinLocations"""
+    try:
+        unused_bins = mssql_manager.get_unused_bin_locations()
+        return jsonify({'success': True, 'data': unused_bins})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
 # ============================================================================
 # History API
 # ============================================================================

@@ -386,6 +386,22 @@ class MSSQLManager:
             ''', (search_pattern,))
             return cursor.fetchall()
 
+    def get_unused_bin_locations(self) -> List[Dict[str, Any]]:
+        """Get bin locations that are not used in Items_BinLocations"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor(as_dict=True)
+            cursor.execute('''
+                SELECT
+                    bl.BinLocationID,
+                    bl.BinLocation
+                FROM dbo.BinLocations_tbl bl
+                LEFT JOIN dbo.Items_BinLocations ibl
+                    ON bl.BinLocationID = ibl.BinLocationID
+                WHERE ibl.id IS NULL
+                ORDER BY bl.BinLocation
+            ''')
+            return cursor.fetchall()
+
     # ========================================================================
     # Authentication Methods
     # ========================================================================

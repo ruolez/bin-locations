@@ -126,6 +126,13 @@
               ↓
             </button>
             <button
+              class="btn btn-secondary"
+              id="showUnusedBinsBtn"
+              title="Show unused bin locations"
+            >
+              Unused Bins
+            </button>
+            <button
               class="btn btn-primary"
               id="addNewBtn"
               title="Add new record (Ctrl+N)"
@@ -467,6 +474,35 @@
           </button>
           <button class="btn btn-error" onclick="confirmDelete()">
             Confirm Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unused Bins Modal -->
+    <div class="modal-overlay" id="unusedBinsModal">
+      <div class="modal modal-large">
+        <div class="modal-header">
+          <h2 id="unusedBinsTitle">Unused Bin Locations</h2>
+        </div>
+        <div class="modal-body">
+          <div id="unusedBinsContent">
+            <div style="text-align: center; padding: 20px;">
+              <div class="spinner"></div>
+              <div>Loading...</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="keyboard-hint">
+            <kbd>ESC</kbd> to close
+          </div>
+          <button
+            class="btn btn-secondary"
+            onclick="closeUnusedBinsModal()"
+            data-modal-close
+          >
+            Close
           </button>
         </div>
       </div>

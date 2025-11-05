@@ -645,19 +645,19 @@ p {
 
 /* Specific widths for each search field container */
 .search-box:has(#binSearch) {
-  flex: 0 0 150px;
-  max-width: 150px;
-  min-width: 150px;
+  flex: 0 0 120px;
+  max-width: 120px;
+  min-width: 120px;
 }
 
 .search-box:has(#productSearch) {
-  flex: 1;
+  flex: 2;
   max-width: none;
 }
 
 .search-box:has(#upcSearch) {
-  flex: 0 0 280px;
-  max-width: 280px;
+  flex: 0 0 200px;
+  max-width: 200px;
   min-width: 140px;
 }
 
@@ -1283,6 +1283,10 @@ tfoot td {
   overflow-y: auto;
   box-shadow: var(--shadow-xl);
   animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-large {
+  max-width: 500px;
 }
 
 @keyframes modalSlideIn {

@@ -1222,3 +1222,111 @@ function handleAuthError(response) {
   }
   return false;
 }
+
+// ============================================================================
+// Unused Bins Modal
+// ============================================================================
+
+async function showUnusedBins() {
+  const modal = document.getElementById("unusedBinsModal");
+  const content = document.getElementById("unusedBinsContent");
+  const title = document.getElementById("unusedBinsTitle");
+
+  // Show modal with loading state
+  modal.classList.add("active");
+  content.innerHTML = `
+    <div style="text-align: center; padding: 20px;">
+      <div class="spinner"></div>
+      <div>Loading unused bins...</div>
+    </div>
+  `;
+
+  try {
+    const response = await fetch("/api/bin-locations/unused");
+
+    if (handleAuthError(response)) return;
+
+    const result = await response.json();
+
+    if (result.success) {
+      const bins = result.data;
+
+      if (bins.length === 0) {
+        // No unused bins
+        title.textContent = "All Bins Are In Use";
+        content.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+            <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
+            <div style="font-size: 16px;">All bin locations are currently assigned to inventory.</div>
+          </div>
+        `;
+      } else {
+        // Display unused bins in table
+        title.textContent = `Unused Bin Locations (${bins.length} found)`;
+        content.innerHTML = `
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Bin Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${bins
+                .map(
+                  (bin) => `
+                <tr>
+                  <td>${bin.BinLocation || "N/A"}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `;
+      }
+    } else {
+      showToast(result.message || "Failed to load unused bins", "error");
+      closeUnusedBinsModal();
+    }
+  } catch (error) {
+    console.error("Error loading unused bins:", error);
+    showToast("Error loading unused bins", "error");
+    closeUnusedBinsModal();
+  }
+}
+
+function closeUnusedBinsModal() {
+  document.getElementById("unusedBinsModal").classList.remove("active");
+}
+
+// Add event listener for show unused bins button
+document.addEventListener("DOMContentLoaded", () => {
+  document
+    .getElementById("showUnusedBinsBtn")
+    .addEventListener("click", showUnusedBins);
+
+  // Modal close on overlay click
+  document.getElementById("unusedBinsModal").addEventListener("click", (e) => {
+    if (e.target.id === "unusedBinsModal") {
+      closeUnusedBinsModal();
+    }
+  });
+
+  // ESC key to close
+  document.addEventListener("keydown", (e) => {
+    if (
+      e.key === "Escape" &&
+      document.getElementById("unusedBinsModal").classList.contains("active")
+    ) {
+      closeUnusedBinsModal();
+    }
+  });
+
+  // Close button handler
+  const closeButtons = document.querySelectorAll('[data-modal-close]');
+  closeButtons.forEach(btn => {
+    if (btn.onclick && btn.onclick.toString().includes('closeUnusedBinsModal')) {
+      // Already has onclick handler from HTML
+    }
+  });
+});
