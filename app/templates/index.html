@@ -44,13 +44,16 @@
           <!-- Search Zone -->
           <div class="toolbar-search">
             <div class="search-box search-box-bin">
-              <input
-                type="text"
-                id="binSearch"
-                placeholder="Bin"
-                autocomplete="off"
-                aria-label="Search by bin location"
-              />
+              <div class="autocomplete-wrapper">
+                <input
+                  type="text"
+                  id="binSearch"
+                  placeholder="Bin"
+                  autocomplete="off"
+                  aria-label="Search by bin location"
+                />
+                <div class="autocomplete-dropdown" id="binDropdown"></div>
+              </div>
               <button
                 class="search-clear"
                 id="binClear"
@@ -299,19 +302,26 @@
                   </div>
                 </span>
               </label>
-              <div class="autocomplete-wrapper">
-                <input
-                  type="text"
-                  id="modalProductSearch"
-                  placeholder="Search for product..."
-                  autocomplete="off"
-                  required
-                />
-                <div class="autocomplete-dropdown" id="modalProductDropdown"></div>
+              <div class="search-field-selector">
+                <select id="modalSearchField" class="input">
+                  <option value="description">Description</option>
+                  <option value="upc">UPC</option>
+                  <option value="sku">SKU</option>
+                </select>
+                <div class="autocomplete-wrapper">
+                  <input
+                    type="text"
+                    id="modalProductSearch"
+                    placeholder="Search for product..."
+                    autocomplete="off"
+                    required
+                  />
+                  <div class="autocomplete-dropdown" id="modalProductDropdown"></div>
+                </div>
               </div>
               <input type="hidden" id="modalProductUPC" />
               <input type="hidden" id="modalProductDescription" />
-              <small>Type to search for a product by description</small>
+              <small>Type to search for a product by description, UPC, or SKU</small>
             </div>
 
             <!-- Qty per Case -->

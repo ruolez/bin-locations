@@ -3,6 +3,7 @@ let allRecords = [];
 let currentEditId = null;
 let productSearchTimeout = null;
 let binSearchTimeout = null;
+let toolbarBinSearchTimeout = null;
 let autocompleteHighlightedIndex = -1;
 let autocompleteItems = [];
 
@@ -21,8 +22,12 @@ function setupEventListeners() {
   document.getElementById("exportBtn").addEventListener("click", exportToExcel);
   document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 
-  // Setup 3 search inputs
-  document.getElementById("binSearch").addEventListener("input", handleSearch);
+  // Setup toolbar bin search with autocomplete
+  const toolbarBinSearch = document.getElementById("binSearch");
+  toolbarBinSearch.addEventListener("input", handleToolbarBinSearch);
+  toolbarBinSearch.addEventListener("focus", handleToolbarBinSearch);
+
+  // Setup product and UPC search inputs (no autocomplete)
   document
     .getElementById("productSearch")
     .addEventListener("input", handleSearch);
@@ -61,11 +66,24 @@ function setupEventListeners() {
   productSearch.addEventListener("focus", handleProductSearch);
   productSearch.addEventListener("keydown", handleAutocompleteKeydown);
 
+  // Search field selector dropdown - trigger new search when changed
+  const searchFieldSelector = document.getElementById("modalSearchField");
+  searchFieldSelector.addEventListener("change", () => {
+    const query = productSearch.value.trim();
+    if (query.length >= 2 || query === "%") {
+      // Clear dropdown first
+      document.getElementById("modalProductDropdown").classList.remove("active");
+      // Trigger new search with current query
+      handleProductSearch({ target: productSearch });
+    }
+  });
+
   // Close dropdowns when clicking outside
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".autocomplete-wrapper")) {
       document.getElementById("modalProductDropdown").classList.remove("active");
       document.getElementById("modalBinLocationDropdown").classList.remove("active");
+      document.getElementById("binDropdown").classList.remove("active");
     }
   });
 
@@ -283,11 +301,21 @@ function handleSearch() {
   const filtered = allRecords.filter((record) => {
     let matches = true;
 
-    // 1. Bin Location - exact match (case-insensitive)
+    // 1. Bin Location - smart matching (prefix if no numbers, exact if has numbers)
     if (binTerm) {
       const binLocation = (record.BinLocation || "").toLowerCase();
       const binSearchLower = binTerm.toLowerCase();
-      matches = matches && binLocation === binSearchLower;
+
+      // Check if search term contains any digit
+      const hasNumber = /\d/.test(binSearchLower);
+
+      if (hasNumber) {
+        // Exact match when search contains numbers
+        matches = matches && binLocation === binSearchLower;
+      } else {
+        // Prefix match when search has no numbers
+        matches = matches && binLocation.startsWith(binSearchLower);
+      }
     }
 
     // 2. Product Description - wildcard support
@@ -538,6 +566,98 @@ function selectBinLocation(binId, binName) {
   document.getElementById("modalBinLocationDropdown").classList.remove("active");
 }
 
+// Handle toolbar bin search with autocomplete
+async function handleToolbarBinSearch(e) {
+  const query = e.target.value.trim();
+
+  clearTimeout(toolbarBinSearchTimeout);
+
+  // Require at least 1 character
+  if (query.length < 1) {
+    document.getElementById("binDropdown").classList.remove("active");
+    // Trigger filter update for empty query
+    handleSearch(e);
+    return;
+  }
+
+  toolbarBinSearchTimeout = setTimeout(async () => {
+    try {
+      const response = await fetch(
+        `/api/bins/search?q=${encodeURIComponent(query)}`,
+      );
+      if (handleAuthError(response)) return;
+      const result = await response.json();
+
+      if (result.success) {
+        displayToolbarBinResults(result.data || [], query);
+      }
+    } catch (error) {
+      console.error("Error searching bin locations:", error);
+    }
+  }, 200);
+
+  // Also trigger the filter update
+  handleSearch(e);
+}
+
+// Display toolbar bin search results with smart filtering
+function displayToolbarBinResults(bins, query) {
+  const dropdown = document.getElementById("binDropdown");
+
+  const queryLower = query.toLowerCase();
+  const hasNumber = /\d/.test(queryLower);
+
+  // Filter results based on whether query contains numbers
+  const filteredBins = bins.filter((bin) => {
+    const binName = (bin.BinLocation || "").toLowerCase();
+    if (hasNumber) {
+      // Exact match when query contains numbers
+      return binName === queryLower;
+    } else {
+      // Prefix match when query has no numbers
+      return binName.startsWith(queryLower);
+    }
+  });
+
+  if (filteredBins.length === 0) {
+    dropdown.innerHTML =
+      '<div class="autocomplete-item">No matching bin locations</div>';
+    dropdown.classList.add("active");
+    return;
+  }
+
+  dropdown.innerHTML = filteredBins
+    .map((bin) => {
+      const binName = bin.BinLocation || "Unnamed Bin";
+      return `
+            <div class="autocomplete-item toolbar-bin-item" data-bin-name="${escapeHtml(binName)}">
+                <div>${escapeHtml(binName)}</div>
+            </div>
+        `;
+    })
+    .join("");
+
+  dropdown.classList.add("active");
+
+  // Attach event listeners to all bin items
+  dropdown.querySelectorAll(".toolbar-bin-item").forEach((item) => {
+    item.addEventListener("click", function () {
+      const binName = this.dataset.binName;
+      selectToolbarBin(binName);
+    });
+  });
+}
+
+// Select bin from toolbar dropdown and apply filter immediately
+function selectToolbarBin(binName) {
+  const binSearchInput = document.getElementById("binSearch");
+  binSearchInput.value = binName;
+  document.getElementById("binDropdown").classList.remove("active");
+
+  // Immediately apply the filter
+  applyFilters();
+}
+
 // Handle product search
 async function handleProductSearch(e) {
   const query = e.target.value.trim();
@@ -552,8 +672,9 @@ async function handleProductSearch(e) {
 
   productSearchTimeout = setTimeout(async () => {
     try {
+      const searchField = document.getElementById("modalSearchField").value;
       const response = await fetch(
-        `/api/products/search?q=${encodeURIComponent(query)}`,
+        `/api/products/search?q=${encodeURIComponent(query)}&field=${encodeURIComponent(searchField)}`,
       );
       const result = await response.json();
 
@@ -581,13 +702,14 @@ function displayProductResults(products) {
   dropdown.innerHTML = products
     .map((product) => {
       const upc = product.ProductUPC || "N/A";
+      const sku = product.ProductSKU || "N/A";
       const description = product.ProductDescription || "Unnamed Product";
       const qtyPerCase = product.UnitQty2 || 0;
 
       return `
-            <div class="autocomplete-item product-item" data-upc="${escapeHtml(upc)}" data-description="${escapeHtml(description)}" data-qty-per-case="${qtyPerCase}">
+            <div class="autocomplete-item product-item" data-upc="${escapeHtml(upc)}" data-sku="${escapeHtml(sku)}" data-description="${escapeHtml(description)}" data-qty-per-case="${qtyPerCase}">
                 <div><strong>${escapeHtml(description)}</strong></div>
-                <small>UPC: ${escapeHtml(upc)} | Qty per Case: ${qtyPerCase > 0 ? qtyPerCase : "Not Set"}</small>
+                <small>UPC: ${escapeHtml(upc)} | SKU: ${escapeHtml(sku)} | Qty per Case: ${qtyPerCase > 0 ? qtyPerCase : "Not Set"}</small>
             </div>
         `;
     })
@@ -843,6 +965,9 @@ function clearAllFilters() {
   document.getElementById("productSearch").value = "";
   document.getElementById("upcSearch").value = "";
 
+  // Close bin dropdown
+  document.getElementById("binDropdown").classList.remove("active");
+
   // Re-run search to show all records
   handleSearch();
 
@@ -858,6 +983,12 @@ function clearAllFilters() {
 function clearSearchField(fieldId) {
   const field = document.getElementById(fieldId);
   field.value = "";
+
+  // Close bin dropdown if clearing bin search
+  if (fieldId === "binSearch") {
+    document.getElementById("binDropdown").classList.remove("active");
+  }
+
   field.focus();
   handleSearch();
 }

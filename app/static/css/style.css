@@ -1945,6 +1945,35 @@ tfoot td {
   color: var(--text-primary);
 }
 
+/* Search field selector - flexbox layout for dropdown + input */
+.search-field-selector {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.search-field-selector select {
+  flex: 0 0 150px;
+  min-width: 150px;
+}
+
+.search-field-selector .autocomplete-wrapper {
+  flex: 1;
+  min-width: 0; /* Allows flexbox to shrink below content size */
+}
+
+/* Mobile responsive: stack vertically on small screens */
+@media (max-width: 600px) {
+  .search-field-selector {
+    flex-direction: column;
+  }
+
+  .search-field-selector select {
+    flex: 1;
+    width: 100%;
+  }
+}
+
 .autocomplete-wrapper {
   position: relative;
 }

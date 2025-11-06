@@ -321,8 +321,8 @@ class MSSQLManager:
 
         return {'success': True, 'message': 'Record deleted successfully'}
 
-    def search_products(self, query: str) -> List[Dict[str, Any]]:
-        """Search products by description with smart wildcard support"""
+    def search_products(self, query: str, search_field: str = 'description') -> List[Dict[str, Any]]:
+        """Search products by description, UPC, or SKU with smart wildcard support"""
         with self.get_connection() as conn:
             cursor = conn.cursor(as_dict=True)
 
@@ -341,15 +341,23 @@ class MSSQLManager:
             else:
                 search_pattern = f'%{query}%'
 
-            cursor.execute('''
+            # Determine which field to search
+            field_map = {
+                'description': 'ProductDescription',
+                'upc': 'ProductUPC',
+                'sku': 'ProductSKU'
+            }
+            field_name = field_map.get(search_field, 'ProductDescription')
+
+            cursor.execute(f'''
                 SELECT TOP 50
                     ProductID,
                     ProductUPC,
+                    ProductSKU,
                     ProductDescription,
                     ISNULL(UnitQty2, 0) as UnitQty2
                 FROM dbo.Items_tbl
-                WHERE ProductDescription LIKE %s
-                AND ProductDescription IS NOT NULL
+                WHERE {field_name} LIKE %s
                 AND Discontinued = 0
                 ORDER BY ProductDescription
             ''', (search_pattern,))

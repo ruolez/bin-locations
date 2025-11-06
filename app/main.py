@@ -497,14 +497,20 @@ def export_to_excel():
 @app.route('/api/products/search', methods=['GET'])
 @login_required
 def search_products():
-    """Search products by description"""
+    """Search products by description, UPC, or SKU"""
     try:
         query = request.args.get('q', '')
+        search_field = request.args.get('field', 'description')
+
+        # Validate search field parameter
+        if search_field not in ['description', 'upc', 'sku']:
+            return jsonify({'success': False, 'message': 'Invalid search field'}), 400
+
         # Allow single % wildcard, otherwise require 2+ characters
         if len(query) < 2 and query != '%':
             return jsonify({'success': True, 'data': []})
 
-        products = mssql_manager.search_products(query)
+        products = mssql_manager.search_products(query, search_field)
         return jsonify({'success': True, 'data': products})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
