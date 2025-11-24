@@ -589,44 +589,26 @@ async function handleToolbarBinSearch(e) {
       const result = await response.json();
 
       if (result.success) {
-        displayToolbarBinResults(result.data || [], query);
+        displayToolbarBinResults(result.data || []);
       }
     } catch (error) {
       console.error("Error searching bin locations:", error);
     }
   }, 200);
-
-  // Also trigger the filter update
-  handleSearch(e);
 }
 
-// Display toolbar bin search results with smart filtering
-function displayToolbarBinResults(bins, query) {
+// Display toolbar bin search results (shows all backend results like modal)
+function displayToolbarBinResults(bins) {
   const dropdown = document.getElementById("binDropdown");
 
-  const queryLower = query.toLowerCase();
-  const hasNumber = /\d/.test(queryLower);
-
-  // Filter results based on whether query contains numbers
-  const filteredBins = bins.filter((bin) => {
-    const binName = (bin.BinLocation || "").toLowerCase();
-    if (hasNumber) {
-      // Exact match when query contains numbers
-      return binName === queryLower;
-    } else {
-      // Prefix match when query has no numbers
-      return binName.startsWith(queryLower);
-    }
-  });
-
-  if (filteredBins.length === 0) {
+  if (bins.length === 0) {
     dropdown.innerHTML =
       '<div class="autocomplete-item">No matching bin locations</div>';
     dropdown.classList.add("active");
     return;
   }
 
-  dropdown.innerHTML = filteredBins
+  dropdown.innerHTML = bins
     .map((bin) => {
       const binName = bin.BinLocation || "Unnamed Bin";
       return `
@@ -642,8 +624,7 @@ function displayToolbarBinResults(bins, query) {
   // Attach event listeners to all bin items
   dropdown.querySelectorAll(".toolbar-bin-item").forEach((item) => {
     item.addEventListener("click", function () {
-      const binName = this.dataset.binName;
-      selectToolbarBin(binName);
+      selectToolbarBin(this.dataset.binName);
     });
   });
 }
@@ -655,7 +636,7 @@ function selectToolbarBin(binName) {
   document.getElementById("binDropdown").classList.remove("active");
 
   // Immediately apply the filter
-  applyFilters();
+  handleSearch();
 }
 
 // Handle product search
