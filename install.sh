@@ -172,12 +172,15 @@ install_git() {
 # Configure NGINX reverse proxy
 configure_nginx() {
     local server_ip=$1
+    local iframe_ip=$2  # Optional - if provided, enable iframe embedding from this IP
 
     print_info "Configuring NGINX reverse proxy..."
 
+    # Start building the config file
     cat > "$NGINX_CONF" <<EOF
 # Bin Locations Management System - NGINX Configuration
 # Auto-generated on $(date)
+# Iframe embedding: ${iframe_ip:-disabled}
 
 upstream bin_locations_backend {
     server 127.0.0.1:5556;
@@ -189,10 +192,27 @@ server {
     listen [::]:80;
     server_name $server_ip localhost _;
 
+EOF
+
+    # Add security headers - conditional based on iframe embedding
+    if [ -n "$iframe_ip" ]; then
+        cat >> "$NGINX_CONF" <<EOF
+    # Security headers (iframe embedding enabled for: $iframe_ip)
+    add_header Content-Security-Policy "frame-ancestors 'self' http://$iframe_ip https://$iframe_ip" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+EOF
+    else
+        cat >> "$NGINX_CONF" <<EOF
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
+EOF
+    fi
+
+    # Continue with rest of config
+    cat >> "$NGINX_CONF" <<EOF
 
     # Client body size limit (for file uploads)
     client_max_body_size 10M;
@@ -420,6 +440,63 @@ remove_installation() {
     fi
 }
 
+# Configure iframe embedding for external dashboard
+do_configure_iframe() {
+    print_header
+    echo -e "${BLUE}Configure Iframe Embedding${NC}"
+    echo ""
+
+    # Check if installation exists
+    if [ ! -f "$NGINX_CONF" ]; then
+        print_error "NGINX configuration not found. Please run install first."
+        echo ""
+        read -p "Press Enter to continue..."
+        show_menu
+        return
+    fi
+
+    print_info "This allows another dashboard system to embed this application in an iframe."
+    print_info "Running this again will replace the previously configured IP."
+    echo ""
+
+    # Prompt for dashboard IP
+    read -p "Enter dashboard IP address that will embed this application: " dashboard_ip
+
+    # Validate IP format (basic validation)
+    if ! [[ $dashboard_ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        print_error "Invalid IP address format. Please use format: xxx.xxx.xxx.xxx"
+        echo ""
+        read -p "Press Enter to continue..."
+        show_menu
+        return
+    fi
+
+    print_info "Updating NGINX configuration for iframe embedding from $dashboard_ip..."
+
+    # Extract current server_name from existing config
+    local server_ip
+    server_ip=$(grep -oP 'server_name \K[^ ;]+' "$NGINX_CONF" 2>/dev/null | head -1)
+
+    if [ -z "$server_ip" ]; then
+        server_ip=$(detect_server_ip)
+    fi
+
+    # Regenerate NGINX config with iframe embedding
+    configure_nginx "$server_ip" "$dashboard_ip"
+
+    # Print success message
+    echo ""
+    echo -e "${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║${NC}  Iframe embedding configured successfully!            ${GREEN}║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    print_info "Dashboard at $dashboard_ip can now embed this application"
+    print_info "NGINX config updated: $NGINX_CONF"
+    echo ""
+    read -p "Press Enter to continue..."
+    show_menu
+}
+
 # ============================================================================
 # Installation Functions
 # ============================================================================
@@ -552,10 +629,11 @@ show_menu() {
     echo ""
     echo -e "  ${GREEN}1)${NC} Clean Install"
     echo -e "  ${YELLOW}2)${NC} Update from GitHub"
-    echo -e "  ${RED}3)${NC} Remove Installation"
-    echo -e "  ${BLUE}4)${NC} Exit"
+    echo -e "  ${BLUE}3)${NC} Configure Iframe Embedding"
+    echo -e "  ${RED}4)${NC} Remove Installation"
+    echo -e "  ${BLUE}5)${NC} Exit"
     echo ""
-    read -p "Enter choice [1-4]: " choice
+    read -p "Enter choice [1-5]: " choice
 
     case $choice in
         1)
@@ -565,9 +643,12 @@ show_menu() {
             do_update
             ;;
         3)
-            do_remove
+            do_configure_iframe
             ;;
         4)
+            do_remove
+            ;;
+        5)
             print_info "Exiting..."
             exit 0
             ;;
