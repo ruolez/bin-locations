@@ -9,6 +9,15 @@ const loginBtn = document.getElementById('loginBtn');
 const errorMessage = document.getElementById('errorMessage');
 
 // ============================================================================
+// Initialization
+// ============================================================================
+
+// Only autofocus if not in an iframe (avoids browser warnings in cross-origin iframes)
+if (window.self === window.top) {
+    usernameInput.focus();
+}
+
+// ============================================================================
 // Event Listeners
 // ============================================================================
 
