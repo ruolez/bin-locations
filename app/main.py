@@ -17,11 +17,6 @@ app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = '/app/data/flask_session'
 app.config['SESSION_PERMANENT'] = False
-# Cookie settings for cross-origin iframe embedding
-# Note: SameSite=None requires Secure=True (HTTPS). For HTTP-only setups,
-# cross-origin iframe sessions may not work in modern browsers.
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = os.environ.get('SECURE_COOKIES', 'true').lower() == 'true'
 Session(app)
 
 # Initialize database managers
