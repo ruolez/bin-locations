@@ -450,7 +450,7 @@ async function saveRecord() {
     return;
   }
 
-  if (!caseQuantity) {
+  if (caseQuantity === '') {
     showToast("Please enter case quantity", "error");
     return;
   }
