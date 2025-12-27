@@ -450,17 +450,12 @@ async function saveRecord() {
     return;
   }
 
-  if (caseQuantity === '') {
-    showToast("Please enter case quantity", "error");
-    return;
-  }
-
   const data = {
     bin_location_id: parseInt(binLocationId),
     product_upc: productUPC,
     product_description: productDescription,
     qty_per_case: qtyPerCase ? parseFloat(qtyPerCase) : null,
-    qty_cases: parseInt(caseQuantity),
+    qty_cases: caseQuantity === '' ? 0 : parseInt(caseQuantity),
   };
 
   showLoading();
